@@ -35,4 +35,14 @@ const createUser = asyncHanler(async (req, res) => {
     }
   });
 
-module.exports = { createUser, loginUserCtrl };
+  // get all users
+  const getallUser = asyncHanler( async(req, res)=>{
+    try{
+      const getUsers = await User.find();
+      res.json(getUsers);
+    } catch(error){
+      throw new Error("Error")
+    }
+  })
+
+module.exports = { createUser, loginUserCtrl,getallUser };
