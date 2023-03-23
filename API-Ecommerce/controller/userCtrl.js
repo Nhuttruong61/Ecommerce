@@ -1,6 +1,8 @@
 const User = require("../models/userModel");
 const asyncHanler = require("express-async-handler");
 const { generateToken } = require("../config/jsonToken");
+const validateMongodbId = require("../utils/validateMongodbId");
+
 const createUser = asyncHanler(async (req, res) => {
   const email = req.body.email;
   const findUser = await User.findOne({ email: email });
@@ -48,6 +50,7 @@ const getAllUser = asyncHanler(async (req, res) => {
 // get single users
 const getaUser = async function (req, res) {
   const { id } = req.params;
+  validateMongodbId(id);
   try {
     const getaUser = await User.findById(id);
     res.json(getaUser);
@@ -58,6 +61,7 @@ const getaUser = async function (req, res) {
 // update user
 const updateUser = asyncHanler(async (req, res) => {
   const { id } = req.user;
+  validateMongodbId(id);
   try {
     const updateUser = await User.findByIdAndUpdate(
       id,
@@ -79,6 +83,8 @@ const updateUser = asyncHanler(async (req, res) => {
 // delete single users
 const deleteaUser = async function (req, res) {
   const { id } = req.params;
+  validateMongodbId(id);
+
   try {
     const deleteaUser = await User.findByIdAndDelete(id);
     res.json(deleteaUser);
@@ -86,6 +92,47 @@ const deleteaUser = async function (req, res) {
     throw new Error("Error");
   }
 };
+// block user
+
+const blockUser = asyncHanler(async (req, res) => {
+  const { id } = req.params;
+  validateMongodbId(id);
+
+  try {
+    const block = await User.findByIdAndUpdate(
+      id,
+      {
+        isBlocked: true,
+      },
+      {
+        new: true,
+      }
+    );
+    res.json(block);
+  } catch (err) {
+    throw new Error(err);
+  }
+});
+
+const unBlockUser = asyncHanler(async (req, res) => {
+  const { id } = req.params;
+  validateMongodbId(id);
+
+  try {
+    const unblock = await User.findByIdAndUpdate(
+      id,
+      {
+        isBlocked: false,
+      },
+      {
+        new: true,
+      }
+    );
+    res.json(unblock);
+  } catch (err) {
+    throw new Error(err);
+  }
+});
 
 module.exports = {
   createUser,
@@ -94,4 +141,6 @@ module.exports = {
   getaUser,
   deleteaUser,
   updateUser,
+  blockUser,
+  unBlockUser,
 };
